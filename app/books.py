@@ -80,8 +80,10 @@ def index():
 
 @bp.route('/books/<int:book_id>')
 def show(book_id):
+    from reviews import user_review_for
     book = db.get_or_404(Book, book_id)
-    return render_template('books/show.html', book=book)
+    return render_template('books/show.html', book=book,
+                           user_review=user_review_for(book_id))
 
 
 @bp.route('/books/new')

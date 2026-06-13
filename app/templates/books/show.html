@@ -28,6 +28,21 @@
 <hr>
 
 <h3 class="mb-3">Рецензии</h3>
+
+{% if current_user.is_authenticated %}
+    {% if user_review %}
+        <div class="card mb-4 border-primary">
+            <div class="card-header bg-primary text-white">Ваша рецензия</div>
+            <div class="card-body">
+                <span class="badge bg-secondary">Оценка: {{ user_review.rating }}</span>
+                <div class="mt-2">{{ user_review.text | markdown | safe }}</div>
+            </div>
+        </div>
+    {% else %}
+        <a href="{{ url_for('reviews.new', book_id=book.id) }}" class="btn btn-primary mb-4">Написать рецензию</a>
+    {% endif %}
+{% endif %}
+
 {% for review in book.reviews %}
     <div class="card mb-3">
         <div class="card-body">

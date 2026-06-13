@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Новая рецензия{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Рецензия на книгу «{{ book.title }}»</h1>
+
+<form method="post" action="{{ url_for('reviews.create', book_id=book.id) }}">
+    <div class="mb-3 col-md-4">
+        <label class="form-label" for="rating">Оценка</label>
+        <select class="form-select" id="rating" name="rating">
+            {% for value, label in ratings %}
+                <option value="{{ value }}" {% if value == 5 %}selected{% endif %}>{{ value }} — {{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="text">Текст рецензии</label>
+        <textarea class="form-control" id="text" name="text" rows="8" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{{ url_for('books.show', book_id=book.id) }}" class="btn btn-outline-secondary">Отмена</a>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>new EasyMDE({ element: document.getElementById('text') });</script>
+{% endblock %}

@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from models import db, Cover
 from auth import bp as auth_bp, init_login_manager
 from books import bp as books_bp
+from reviews import bp as reviews_bp
 from tools import render_markdown
 
 app = Flask(__name__)
@@ -26,6 +27,7 @@ def handle_sqlalchemy_error(err):
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(books_bp)
+app.register_blueprint(reviews_bp)
 
 # Markdown-описания преобразуются в HTML прямо в шаблонах.
 app.jinja_env.filters['markdown'] = render_markdown
