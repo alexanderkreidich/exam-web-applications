@@ -6,7 +6,7 @@ SECRET_KEY = 'change-me-in-production'
 SQLALCHEMY_DATABASE_URI = 'sqlite:///project.db'
 # SQLALCHEMY_DATABASE_URI = 'mysql+mysqlconnector://user:password@std-mysql.ist.mospolytech.ru/db_name'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_ECHO = True
+SQLALCHEMY_ECHO = False
 
 # По 10 записей на страницу (требование задания)
 PER_PAGE = 10

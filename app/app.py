@@ -6,6 +6,7 @@ from models import db, Cover
 from auth import bp as auth_bp, init_login_manager
 from books import bp as books_bp
 from reviews import bp as reviews_bp
+from commands import init_commands
 from tools import render_markdown
 
 app = Flask(__name__)
@@ -16,6 +17,7 @@ app.config.from_pyfile('config.py')
 db.init_app(app)
 migrate = Migrate(app, db)
 init_login_manager(app)
+init_commands(app)
 
 
 @app.errorhandler(SQLAlchemyError)
