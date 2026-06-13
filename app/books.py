@@ -1,9 +1,11 @@
+import os
+
 from flask import (
     Blueprint, render_template, request, current_app, flash, redirect, url_for,
 )
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import db, Book, Genre
+from models import db, Book, Genre, Cover
 from tools import BooksFilter, ImageSaver, sanitize_markdown
 from auth import rights_required
 
@@ -149,9 +151,32 @@ def update(book_id):
     return redirect(url_for('books.show', book_id=book.id))
 
 
-# --- Удаление книги и рецензии реализуются в следующих коммитах ---
-
 @bp.route('/books/<int:book_id>/delete', methods=['POST'])
 @rights_required('admin')
 def delete(book_id):
-    return ('Not implemented', 501)
+    book = db.get_or_404(Book, book_id)
+    title = book.title
+    cover = book.cover
+    cover_filename = cover.storage_filename if cover else None
+    cover_md5 = cover.md5_hash if cover else None
+
+    try:
+        # Связанные записи (обложка, рецензии, связи с жанрами) удаляются каскадно.
+        db.session.delete(book)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash('При удалении книги возникла ошибка.', 'danger')
+        return redirect(url_for('books.index'))
+
+    # Удаляем файл обложки, если он больше не используется другими книгами.
+    if cover_filename and cover_md5:
+        still_used = db.session.scalar(
+            db.select(db.func.count(Cover.id)).where(Cover.md5_hash == cover_md5))
+        if not still_used:
+            path = os.path.join(current_app.config['UPLOAD_FOLDER'], cover_filename)
+            if os.path.exists(path):
+                os.remove(path)
+
+    flash(f'Книга «{title}» успешно удалена.', 'success')
+    return redirect(url_for('books.index'))

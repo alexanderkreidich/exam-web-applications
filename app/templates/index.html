@@ -73,7 +73,9 @@
                     <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Редактировать</a>
                 {% endif %}
                 {% if current_user.is_authenticated and current_user.can_delete_books %}
-                    <button type="button" class="btn btn-sm btn-outline-danger">Удалить</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger"
+                            data-bs-toggle="modal" data-bs-target="#deleteModal"
+                            data-book-id="{{ book.id }}" data-book-title="{{ book.title }}">Удалить</button>
                 {% endif %}
             </td>
         </tr>
@@ -92,5 +94,25 @@
 
 {% if current_user.is_authenticated and current_user.can_delete_books %}
     <a href="{{ url_for('books.new') }}" class="btn btn-success">Добавить книгу</a>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" id="deleteForm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Удаление книги</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        Вы уверены, что хотите удалить книгу <span id="deleteBookTitle"></span>?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Да</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Нет</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endif %}
 {% endblock %}
