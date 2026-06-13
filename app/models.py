@@ -138,7 +138,7 @@ class Cover(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     file_name: Mapped[str] = mapped_column(String(255))
     mime_type: Mapped[str] = mapped_column(String(100))
-    md5_hash: Mapped[str] = mapped_column(String(32), unique=True)
+    md5_hash: Mapped[str] = mapped_column(String(32))
     book_id: Mapped[int] = mapped_column(
         ForeignKey('books.id', ondelete='CASCADE'))
 
@@ -146,8 +146,9 @@ class Cover(Base):
 
     @property
     def storage_filename(self):
+        # Имя файла на основе MD5: идентичные изображения хранятся в одном файле.
         _, ext = os.path.splitext(self.file_name)
-        return str(self.id) + ext
+        return self.md5_hash + ext
 
     @property
     def url(self):

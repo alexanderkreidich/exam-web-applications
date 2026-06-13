@@ -1,9 +1,27 @@
 {% extends 'base.html' %}
+{% from 'books/_fields.html' import book_fields %}
 
 {% block title %}Добавление книги{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+{% endblock %}
+
 {% block content %}
 <h1 class="mb-4">Добавление книги</h1>
-{# Форма ввода данных о книге (с макросом полей и загрузкой обложки) реализуется в следующем коммите. #}
-<p class="text-muted">Раздел в разработке.</p>
+
+<form method="post" action="{{ url_for('books.create') }}" enctype="multipart/form-data">
+    {{ book_fields(book, genres, selected_genre_ids) }}
+    <div class="mb-3">
+        <label class="form-label" for="cover">Обложка</label>
+        <input type="file" class="form-control" id="cover" name="cover" accept="image/*" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{{ url_for('books.index') }}" class="btn btn-outline-secondary">Отмена</a>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>new EasyMDE({ element: document.getElementById('short_desc') });</script>
 {% endblock %}

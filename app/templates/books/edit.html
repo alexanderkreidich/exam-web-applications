@@ -1,9 +1,24 @@
 {% extends 'base.html' %}
+{% from 'books/_fields.html' import book_fields %}
 
 {% block title %}Редактирование книги{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+{% endblock %}
+
 {% block content %}
 <h1 class="mb-4">Редактирование книги «{{ book.title }}»</h1>
-{# Форма редактирования (с тем же макросом полей, но без загрузки обложки) реализуется в следующем коммите. #}
-<p class="text-muted">Раздел в разработке.</p>
+
+{# На странице редактирования поля для загрузки обложки нет (обложка не меняется). #}
+<form method="post" action="{{ url_for('books.update', book_id=book.id) }}">
+    {{ book_fields(book, genres, selected_genre_ids) }}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+    <a href="{{ url_for('books.show', book_id=book.id) }}" class="btn btn-outline-secondary">Отмена</a>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>new EasyMDE({ element: document.getElementById('short_desc') });</script>
 {% endblock %}

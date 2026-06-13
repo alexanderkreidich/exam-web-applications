@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: ece7ff8cc7f2
+Revision ID: 5dd6e5d87264
 Revises: 
-Create Date: 2026-06-13 16:57:34.123007
+Create Date: 2026-06-13 17:04:55.009346
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ece7ff8cc7f2'
+revision = '5dd6e5d87264'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -55,8 +55,7 @@ def upgrade():
     sa.Column('md5_hash', sa.String(length=32), nullable=False),
     sa.Column('book_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['book_id'], ['books.id'], name=op.f('fk_covers_book_id_books'), ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_covers')),
-    sa.UniqueConstraint('md5_hash', name=op.f('uq_covers_md5_hash'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_covers'))
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),

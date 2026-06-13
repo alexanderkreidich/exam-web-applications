@@ -1,8 +1,12 @@
+import os
+import hashlib
+
 import bleach
 import markdown as md
 from flask import current_app
+from werkzeug.utils import secure_filename
 
-from models import db, Book, book_genres
+from models import db, Book, Cover, book_genres
 
 
 def sanitize_markdown(text):
@@ -22,6 +26,39 @@ def render_markdown(text):
     if not text:
         return ''
     return md.markdown(text, extensions=['extra', 'nl2br'])
+
+
+class ImageSaver:
+    """Сохранение обложки книги: вычисление MD5, запись БД-записи и файла.
+
+    Файл записывается на диск только после успешного коммита транзакции,
+    поэтому при ошибке БД не приходится удалять файл. Идентичные изображения
+    (с одинаковым MD5) хранятся в одном файле — повторно файл не пишется.
+    """
+
+    def __init__(self, file):
+        self.file = file
+        self.bytes = file.read()
+        self.md5_hash = hashlib.md5(self.bytes).hexdigest()
+        _, self.ext = os.path.splitext(secure_filename(file.filename) or '')
+
+    def add_record(self, book_id):
+        cover = Cover(
+            file_name=secure_filename(self.file.filename) or 'cover',
+            mime_type=self.file.mimetype or 'application/octet-stream',
+            md5_hash=self.md5_hash,
+            book_id=book_id,
+        )
+        db.session.add(cover)
+        return cover
+
+    def store_file(self):
+        folder = current_app.config['UPLOAD_FOLDER']
+        os.makedirs(folder, exist_ok=True)
+        path = os.path.join(folder, self.md5_hash + self.ext)
+        if not os.path.exists(path):
+            with open(path, 'wb') as out:
+                out.write(self.bytes)
 
 
 class BooksFilter:
