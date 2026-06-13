@@ -1,0 +1,22 @@
+# Виртуальное окружение
+ve/
+venv/
+.venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Локальная БД и загруженные файлы
+*.db
+app/instance/
+app/media/images/*
+!app/media/images/.gitkeep
+
+# Окружение
+.env
+
+# Системное
+.DS_Store

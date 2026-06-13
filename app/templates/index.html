@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% from 'pagination.html' import render_pagination %}
+
+{% block title %}Книги — Электронная библиотека{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Книги</h1>
+
+{# Форма поиска (индивидуальный вариант 3) #}
+<form class="card card-body mb-4" method="get" action="{{ url_for('books.index') }}">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="form-label">Название</label>
+            <input type="text" class="form-control" name="title" value="{{ search_params.title or '' }}">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Автор</label>
+            <input type="text" class="form-control" name="author" value="{{ search_params.author or '' }}">
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Жанр</label>
+            <select class="form-select" name="genre_ids" multiple>
+                {% for genre in genres %}
+                    <option value="{{ genre.id }}" {% if genre.id in search_params.genre_ids %}selected{% endif %}>{{ genre.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Год</label>
+            <select class="form-select" name="years" multiple>
+                {% for year in years %}
+                    <option value="{{ year }}" {% if year in search_params.years %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Объём от</label>
+            <input type="number" min="0" class="form-control" name="pages_from" value="{{ search_params.pages_from or '' }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Объём до</label>
+            <input type="number" min="0" class="form-control" name="pages_to" value="{{ search_params.pages_to or '' }}">
+        </div>
+        <div class="col-md-6 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary">Найти</button>
+            <a href="{{ url_for('books.index') }}" class="btn btn-outline-secondary">Сбросить</a>
+        </div>
+    </div>
+</form>
+
+<table class="table table-hover align-middle">
+    <thead>
+        <tr>
+            <th>Название</th>
+            <th>Жанры</th>
+            <th>Год</th>
+            <th>Оценка</th>
+            <th>Рецензии</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.genres | map(attribute='name') | join(', ') }}</td>
+            <td>{{ book.year }}</td>
+            <td>{{ book.rating }}</td>
+            <td>{{ book.reviews_count }}</td>
+            <td class="text-end">
+                <a class="btn btn-sm btn-outline-primary" href="{{ url_for('books.show', book_id=book.id) }}">Просмотр</a>
+                {% if current_user.is_authenticated and current_user.can_edit_books %}
+                    <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('books.edit', book_id=book.id) }}">Редактировать</a>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.can_delete_books %}
+                    <button type="button" class="btn btn-sm btn-outline-danger">Удалить</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted">Книги не найдены</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{# Сохраняем непустые параметры поиска при переходе по страницам #}
+{% set page_args = {} %}
+{% for key, value in search_params.items() %}
+    {% if value %}{% set _ = page_args.update({key: value}) %}{% endif %}
+{% endfor %}
+{{ render_pagination(pagination, 'books.index', page_args) }}
+
+{% if current_user.is_authenticated and current_user.can_delete_books %}
+    <a href="{{ url_for('books.new') }}" class="btn btn-success">Добавить книгу</a>
+{% endif %}
+{% endblock %}

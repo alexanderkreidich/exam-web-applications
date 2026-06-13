@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} — Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        {% if book.cover %}
+            <img src="{{ book.cover.url }}" class="img-fluid rounded border" alt="{{ book.title }}">
+        {% else %}
+            <div class="bg-light border rounded d-flex align-items-center justify-content-center text-muted" style="height: 320px;">Нет обложки</div>
+        {% endif %}
+    </div>
+    <div class="col-md-8">
+        <h1>{{ book.title }}</h1>
+        <dl class="row">
+            <dt class="col-sm-3">Автор</dt><dd class="col-sm-9">{{ book.author }}</dd>
+            <dt class="col-sm-3">Год</dt><dd class="col-sm-9">{{ book.year }}</dd>
+            <dt class="col-sm-3">Издательство</dt><dd class="col-sm-9">{{ book.publisher }}</dd>
+            <dt class="col-sm-3">Объём</dt><dd class="col-sm-9">{{ book.pages }} стр.</dd>
+            <dt class="col-sm-3">Жанры</dt><dd class="col-sm-9">{{ book.genres | map(attribute='name') | join(', ') }}</dd>
+        </dl>
+        <h5>Описание</h5>
+        <div>{{ book.short_desc | markdown | safe }}</div>
+    </div>
+</div>
+
+<hr>
+
+<h3 class="mb-3">Рецензии</h3>
+{% for review in book.reviews %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <strong>{{ review.user.full_name }}</strong>
+                <span class="badge bg-secondary">Оценка: {{ review.rating }}</span>
+            </div>
+            <div class="mt-2">{{ review.text | markdown | safe }}</div>
+        </div>
+    </div>
+{% else %}
+    <p class="text-muted">Рецензий пока нет.</p>
+{% endfor %}
+{% endblock %}
