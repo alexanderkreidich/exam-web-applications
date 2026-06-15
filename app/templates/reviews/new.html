@@ -20,7 +20,7 @@
     </div>
     <div class="mb-3">
         <label class="form-label" for="text">Текст рецензии</label>
-        <textarea class="form-control" id="text" name="text" rows="8" required></textarea>
+        <textarea class="form-control" id="text" name="text" rows="8"></textarea>
     </div>
     <button type="submit" class="btn btn-primary">Сохранить</button>
     <a href="{{ url_for('books.show', book_id=book.id) }}" class="btn btn-outline-secondary">Отмена</a>
